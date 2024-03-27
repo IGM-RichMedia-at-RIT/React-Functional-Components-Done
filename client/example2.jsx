@@ -12,7 +12,7 @@
    components, while still maintaining the benefits of using state.
 */
 const React = require('react');
-const ReactDOM = require('react-dom');
+const { createRoot } = require('react-dom/client');
 
 const HelloUser = (props) => {
     /* Here we are registering a state with the React.useState hook. We give it
@@ -42,44 +42,8 @@ const HelloUser = (props) => {
    username updates automatically.
 */
 const init = () => {
-    ReactDOM.render( <HelloUser username='Austin' />,
-      document.getElementById('app'));
+    const root = createRoot(document.getElementById('app'));
+    root.render( <HelloUser username='Austin' /> );
 };
   
 window.onload = init;
-
-
-/* The same code as above, but using a stateless component without hooks.
-   Note how we have to manually rerender the component when our username updates.
-   Another issue with doing things this way is that our component is now built to
-   only render to the "app" div. We could potentially pass in the render target element
-   as a prop, but then we end up making our component even more messy. The above
-   solution is far cleaner, and utilizes react to properly update the component when needed.
-*/
-
-/*
-    const HelloUser = (props) => {
-        const handleNameChange = (e) => {
-            ReactDOM.render(
-                <HelloUser username={e.target.value} />,
-                document.getElementById('app')
-            );
-        };
-
-        return (
-            <div>
-                <p>Hello {props.username}</p>
-                <label>Change Name: </label>
-                <input type="text" value={props.username} onChange={handleNameChange} />
-            </div>
-        );
-    }
-
-    const init = () => {
-        ReactDOM.render( <HelloUser username='Austin' />,
-        document.getElementById('app'));
-    };
-    
-    window.onload = init;
-*/
-  

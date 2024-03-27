@@ -11,7 +11,7 @@
 
 const React = require('react');
 const { useState, useEffect } = React; // Pull useState and useEffect out of react.
-const ReactDOM = require('react-dom');
+const { createRoot } = require('react-dom/client');
 
 const SongContainer = (props) => {
     /* First we setup our songs hook so that our component will update when the
@@ -34,10 +34,16 @@ const SongContainer = (props) => {
        the component. Because this rerenders the component, if we had not passed an empty
        array as the second parameter our effect would run again causing an infinite loop.
     */
-    useEffect(async () => {
-        const response = await fetch('/getSongs');
-        const songs = await response.json();
-        setSongs(songs);
+    useEffect(() => {
+        /* React does not want top-level async functions being used in effects, and so it
+           recommends nesting them inside of a normal function and then calling them.
+        */
+        const loadSongsFromServer = async () => {
+            const response = await fetch('/getSongs');
+            const songs = await response.json();
+            setSongs(songs);
+        };
+        loadSongsFromServer();
     }, []);
     
     /* Our effect runs in the background, so immediately our component will render with
@@ -80,64 +86,8 @@ const SongContainer = (props) => {
    need to kick off the process by rendering it the first time.
 */
 const init = () => {
-    ReactDOM.render(
-        <SongContainer songs={[]} />,
-        document.getElementById('app')
-    );
+    const root = createRoot(document.getElementById('app'));
+    root.render( <SongContainer songs={[]} /> );
 }
 
 window.onload = init;
-
-/* The below example shows what the above component might look like without the
-   useState and useEffect hooks. Something like the below code may be useful if
-   you are doing something else with the songs returned by the server. However,
-   if you are only using them to render the component the above is better.
-*/
-
-/*
-const SongContainer = (props) => {
-  if(props.songs.length === 0) {
-        return (
-            <div>
-                <h3>No Songs Yet!</h3>
-            </div>
-        );
-    }
-  
-    const songList = props.songs.map((song) => {
-        return (
-            <div key={song.title}>
-                <h2 >{song.artist} - <i>{song.title}</i></h2>
-            </div>
-        );
-    });
-  
-    return (
-        <div>
-            <h1> My favorite songs! </h1>
-            {songList}
-        </div>
-    )
-};
-
-const loadSongsFromServer = async () => {
-    const response = await fetch('/getSongs');
-    const songs = await response.json();
-    ReactDOM.render(
-        <SongContainer songs={songs} />,
-        document.getElementById('app')
-    );
-};
-
-
-const init = () => {
-  ReactDOM.render(
-    <SongContainer songs={[]} />,
-    document.getElementById('app')
-  );
-  
-  loadSongsFromServer();
-};
-
-window.onload = init;
-*/
