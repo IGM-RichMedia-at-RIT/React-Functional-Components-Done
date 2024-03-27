@@ -40,8 +40,8 @@ const SongContainer = (props) => {
         */
         const loadSongsFromServer = async () => {
             const response = await fetch('/getSongs');
-            const songs = await response.json();
-            setSongs(songs);
+            const data = await response.json();
+            setSongs(data);
         };
         loadSongsFromServer();
     }, []);
